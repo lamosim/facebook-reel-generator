@@ -1,0 +1,17 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Your projects (footage, music, generated work, renders) never leave this machine.
+# Only the template ships with the repo.
+projects/*
+!projects/_template/
+
+# Personal / machine-local Claude Code files
+CLAUDE.local.md
+.claude/settings.local.json
+
+# Tool caches and OS noise
+.firecrawl/
+.DS_Store

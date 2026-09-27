@@ -1,0 +1,114 @@
+# ── Trip-Footage → Facebook Reel Generator: tunable defaults ──
+# Every threshold/weight/encode setting lives here so tuning needs no code edits.
+
+# ── Output target (Facebook Reels spec) ──
+output:
+  width: 1080
+  height: 1920
+  fps: 30
+  gop: 60                # closed GOP = 2s @ 30fps (-g 60 -keyint_min 60)
+  video_bitrate: "10M"
+  video_maxrate: "12M"
+  video_bufsize: "16M"
+  x264_preset: "medium"
+  audio_bitrate: "192k"
+  audio_sample_rate: 48000
+  audio_channels: 2
+
+# ── Edit defaults (the EDL can override per-project) ──
+edit:
+  target_duration: 30.0        # seconds; practical Reels range 15–90
+  reframe_mode: "blur-pad"     # blur-pad | fill | pad
+  pacing: "dynamic"            # dynamic (clip length follows content + music) | uniform
+  cut_density: 2               # uniform mode only: make a cut every N beats
+  # dynamic mode: each clip holds a beat-count set by BOTH the music energy at
+  # that moment AND the shot's content (EDL `hold`/`motion`). Calm music + a
+  # high-`hold` payoff shot → long hold; energetic music + a quick detail → fast
+  # cut. Every cut still lands on a beat.
+  beats_per_cut_min: 4         # fastest cuts (loud music / low-hold / dynamic shots)
+  beats_per_cut_max: 12        # longest holds (quiet music / high-hold scenic shots)
+  energy_smooth_beats: 4       # smoothing window so pacing tracks sections, not single beats
+  duration_music_weight: 0.6   # how strongly music energy stretches/shrinks a clip (0..1)
+  duration_content_weight: 0.6 # how strongly content `hold` stretches/shrinks a clip (0..1)
+  motion_shake_threshold: 11.0 # segment shake above this auto-tags a shot "dynamic" motion
+  # ── Transitions (varied, synced to music energy + content) ──
+  # Soft transition is a clean linear CROSSFADE (ffmpeg "fade"), not a noisy
+  # pixel "dissolve". The hard "cut" is a ~2-frame blend.
+  transition: "auto"           # auto (per-cut, from energy+content) | cut | crossfade
+  crossfade_duration: 0.5      # seconds, smooth crossfade between calm/scenic shots
+  fadeblack_duration: 0.6      # seconds, dip-to-black (use via per-shot override at breaks)
+  cut_duration: 0.06           # seconds, ~2-frame blend that reads as a hard cut
+  transition_cut_energy: 0.55  # music energy at a cut ≥ this → hard cut (else crossfade)
+  keep_original_audio: false   # false = music only; true = duck original under music
+  auto_music_section: true     # analyze the track & start the overlay at its most
+                               # captivating window instead of at 0:00. Override per-project
+                               # with EDL "music_start".
+  music_section_strategy: "energy"  # energy = lead with the loudest/hookiest part (immediate
+                                    # attention) | build = section that builds to a late peak
+                                    # (climax synced to the visual climax)
+  duck_volume: 0.12            # original-audio gain when keep_original_audio = true
+  music_fade_in: 0.5           # seconds, start fade (smooths a mid-song entry)
+  music_fade_out: 2.0          # seconds, end fade on the music bed
+  blur_sigma: 20               # gaussian blur strength for blur-pad background
+
+# ── Still photos (treated as short shots with a subtle Ken Burns move) ──
+image:
+  still_duration: 3.0          # default seconds a photo is held (EDL/pacing can override)
+  ken_burns: true              # slow zoom on stills so they feel alive, not frozen
+  zoom_max: 1.10               # end zoom factor for the Ken Burns move
+  min_sharpness: 40.0          # photos are usually sharp; gentler floor than video
+
+# ── Segmentation (PySceneDetect) ──
+segment:
+  detector: "adaptive"         # adaptive (handheld-robust) | content
+  adaptive_threshold: 3.0
+  min_scene_len: 0.6           # seconds; shorter shots get merged
+  short_clip_threshold: 6.0    # clips under this are treated as one segment
+  min_segment_duration: 1.0    # discard candidate segments shorter than this
+
+# ── Quality scoring (OpenCV) ──
+score:
+  sample_interval: 0.5         # seconds between sampled frames
+  filmstrip_frames: 5          # frames in each segment's filmstrip (for trim review)
+  # composite keep_score weights (normalized internally)
+  weights:
+    sharpness: 0.45
+    exposure: 0.25
+    stability: 0.30
+  # hard-drop thresholds (segment flagged kept=false, not deleted)
+  min_sharpness: 80.0          # variance-of-Laplacian floor
+  min_luma: 35                 # 0–255 mean V-channel; below = too dark
+  max_luma: 245                # above = blown out
+  max_shake: 18.0              # mean optical-flow magnitude ceiling
+
+# ── Deep catalog (dense per-clip profiling so prep captures ALL moments) ──
+# A thorough one-time pass: dense frame sampling, full optical-flow trace, motion
+# EVENT detection (bursts/settles), PEOPLE detection, AUDIO activity, and an
+# event-anchored dense contact sheet per clip. Writes work/catalog_raw.json; Claude
+# then reviews it and writes work/catalog.json (descriptions/tags/best trims).
+catalog:
+  enabled: true
+  sample_interval: 0.4         # seconds between densely-sampled frames (small = thorough)
+  dense_sheet_frames: 24       # frames in each clip's dense contact sheet
+  detect_people: true          # HOG full-body + Haar face detection per frame
+  detect_audio: true           # original-audio loudness / voice-band (candid moments)
+  flow_spike_k: 1.6            # flow > mean + k*std → a "motion_burst" moment
+  min_moment_gap: 0.8          # merge same-type events closer than this (seconds)
+
+# ── Beat detection (librosa) ──
+beats:
+  use_onsets_fallback: true    # also compute onset grid as alternate cut points
+
+# ── Lyrics (local OpenAI Whisper transcription, timestamped) ──
+# Transcribes the music track's vocals WITH timestamps so the editor can place
+# each clip where its imagery emotionally matches the lyric playing then. Runs
+# on-device (no API key); the result is cached per track.
+lyrics:
+  enabled: true                # false = skip transcription / lyric-sync entirely
+  model: "medium"              # whisper model: tiny | base | small | medium | large
+                               # (bigger = more accurate timestamps, slower). medium is
+                               # the default: 'small' mis-times long instrumental/repeated
+                               # passages in full songs (hallucinated blocks), which breaks
+                               # lyric→clip alignment. Bump to 'large' for hard cases.
+  language: "en"               # force a language, or null to auto-detect
+  no_speech_threshold: 0.6     # higher = drop more instrumental/no-vocal segments

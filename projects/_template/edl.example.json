@@ -1,0 +1,13 @@
+{
+  "_comment": "Reference EDL. Claude writes the real one to work/edl.json after prep. See ../../README.md for the schema. `id` values come from work/segments.json; all top-level fields are optional and fall back to config.yaml.",
+  "target_duration": 30.0,
+  "reframe_mode": "blur-pad",
+  "transition": "cut",
+  "cut_density": 2,
+  "keep_original_audio": false,
+  "segments": [
+    { "id": "c00_s01", "text": "Day 1" },
+    { "id": "c02_s00", "in": 4.0 },
+    { "clip": "DJI_0042.mp4", "in": 2.0, "out": 7.5 }
+  ]
+}

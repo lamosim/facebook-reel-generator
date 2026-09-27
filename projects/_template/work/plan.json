@@ -1,0 +1,33 @@
+{
+ "_readme": "Beat walk for pipeline.plan --write-edl. start_beat = index into work/beats.json (cold open on the tail of a chorus); beats = whole beats per shot; map cards need an explicit clip path. Delete this key.",
+ "start_beat": 0,
+ "target_duration": 80.0,
+ "defaults": {
+  "hold": 0.7,
+  "motion": "calm",
+  "dir": "../work/prerender"
+ },
+ "shots": [
+  {
+   "name": "cold_open",
+   "beats": 11,
+   "motion": "dynamic",
+   "note": "hook"
+  },
+  {
+   "name": "map1",
+   "beats": 9,
+   "clip": "../work/maps/map1.mp4"
+  },
+  {
+   "name": "day1",
+   "beats": 6
+  },
+  {
+   "name": "finish",
+   "beats": 11,
+   "hold": 0.9,
+   "note": "arrival flare on the last hit"
+  }
+ ]
+}

@@ -1,0 +1,85 @@
+{
+ "_readme": "Story clips for pipeline.clips (see CLAUDE.md 'Story-reel playbook'). Times: seconds or beat expressions ('6B', '3B+0.5'). src is relative to raw/. Delete this key.",
+ "out_dir": "work/prerender",
+ "tail_pad": 0.3,
+ "grade": {
+  "sat": 0.92,
+  "gamma": 1.0
+ },
+ "clips": [
+  {
+   "name": "cold_open",
+   "shots": [
+    {
+     "src": "CLIP_A.mov",
+     "ss": 0.0,
+     "t": "4B"
+    },
+    {
+     "src": "CLIP_B.mov",
+     "ss": 0.0,
+     "t": "3B"
+    },
+    {
+     "src": "CLIP_C.mov",
+     "ss": 0.0,
+     "t": "4B"
+    }
+   ],
+   "hook": {
+    "lines": [
+     [
+      "WHAT 30 MILES",
+      0.1
+     ],
+     [
+      "LOOKS LIKE",
+      0.1
+     ],
+     [
+      "WHEN YOU HAVE",
+      "4B+0.05"
+     ],
+     [
+      "TO CARRY THE BOAT.",
+      "4B+0.05"
+     ]
+    ]
+   }
+  },
+  {
+   "name": "day1",
+   "shots": [
+    {
+     "src": "CLIP_D.mov",
+     "ss": 0.0,
+     "t": "6B"
+    }
+   ],
+   "captions": [
+    {
+     "big": "DAY 1  ·  THE CARRY",
+     "sub": "one humble line, lowercase, under 50 characters.",
+     "t0": 0.35
+    }
+   ]
+  },
+  {
+   "name": "finish",
+   "shots": [
+    {
+     "src": "CLIP_Z.mov",
+     "ss": 0.0,
+     "t": "3B+0.5"
+    },
+    {
+     "src": "../work/maps/map4.mp4",
+     "ss": 0.0,
+     "t": 5.0,
+     "grade": false
+    }
+   ],
+   "xfade": 0.5
+  }
+ ]
+}

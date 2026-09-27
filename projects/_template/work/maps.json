@@ -1,0 +1,65 @@
+{
+ "_readme": "Route map cards for pipeline.mapcards. Read start/finish/window/ui_patches off the screenshot in source pixels; checkpoints are route fractions 0..1. Delete this key.",
+ "src": "TRIP Overview.png",
+ "start": [
+  0,
+  0
+ ],
+ "finish": [
+  0,
+  0
+ ],
+ "route_hsv": {
+  "h_max": 12,
+  "s_min": 120,
+  "v_min": 120
+ },
+ "window": [
+  0,
+  0,
+  1080,
+  1920
+ ],
+ "ui_patches": [],
+ "checkpoints": {
+  "camp1": 0.45
+ },
+ "labels": [
+  {
+   "at": "camp1",
+   "text": "NIGHT 1",
+   "side": "right"
+  }
+ ],
+ "cards": [
+  {
+   "name": "map1",
+   "kind": "opener",
+   "dur": 5.5,
+   "display": 4.92,
+   "big": "30 MILES",
+   "sub": "3 DAYS  ·  2 CANOES  ·  ADIRONDACKS"
+  },
+  {
+   "name": "map2",
+   "kind": "day",
+   "from": "start",
+   "to": "camp1",
+   "big": "DAY 2",
+   "sub": "CHAPTER NAME",
+   "display": 2.79,
+   "dur": 3.4
+  },
+  {
+   "name": "map4",
+   "kind": "finish",
+   "from": "camp1",
+   "dur": 5.0,
+   "arrive": 3.2,
+   "big": "30 MILES",
+   "closing": "CARRIED IN.   PADDLED OUT.",
+   "closing_t": 1.9,
+   "fade_at": 3.92
+  }
+ ]
+}

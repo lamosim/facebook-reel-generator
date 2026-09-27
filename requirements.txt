@@ -1,0 +1,7 @@
+opencv-python
+scenedetect[opencv]
+librosa>=0.11
+numpy
+pyyaml
+openai-whisper        # local, timestamped lyric transcription (pulls torch)
+pillow            # caption + map-card text (pipeline/clips.py, pipeline/mapcards.py)

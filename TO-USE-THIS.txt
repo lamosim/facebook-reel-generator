@@ -1,0 +1,85 @@
+===========================================================================
+ FACEBOOK REEL GENERATOR — HOW TO USE
+===========================================================================
+
+The easy way: just tell Claude. Open Claude Code in this folder and say
+something like:
+
+    "Make a chill, nostalgic ~30s reel from the iceland folder."
+
+Claude runs everything below for you (probing, picking the best shots,
+ordering them to the vibe, beat-syncing, and exporting an upload-ready file).
+
+
+---------------------------------------------------------------------------
+ ONE-TIME SETUP (only the first time)
+---------------------------------------------------------------------------
+
+    python3 bootstrap.py          (Windows: py bootstrap.py)
+
+It creates a private Python environment, installs the packages, checks that
+ffmpeg is installed (and tells you how to install it if not), and downloads
+the lyric-transcription model once. Works on macOS, Windows and Linux.
+Easiest of all: open Claude Code in this folder and say "set up this project".
+
+
+---------------------------------------------------------------------------
+ MAKING A REEL — STEP BY STEP
+---------------------------------------------------------------------------
+
+1) Create a project folder for the trip (copy the template):
+
+       cp -R projects/_template projects/iceland
+
+2) Put your media in it:
+       - video clips  ->  projects/iceland/raw/      (.mp4 .mov .m4v .avi .mkv .webm)
+       - one music track -> projects/iceland/music/   (.mp3 .wav .m4a ...)
+
+3) Activate the environment (each new terminal session):
+
+       . .venv/bin/activate          (macOS / Linux)
+       .venv\Scripts\activate        (Windows)
+
+4) PHASE 1 — analyze the footage + music:
+
+       python -m pipeline.prep projects/iceland
+
+   This scores every shot (incl. a "payoff" metric for where each clip's
+   moment lands), saves filmstrips for clean trimming, detects beats, AND
+   transcribes the song's lyrics with timestamps (local Whisper — the first
+   run downloads the model, ~a minute; cached after).
+
+5) Tell Claude the vibe. Claude looks at the clips + filmstrips, maps the
+   lyrics onto the reel's timeline:
+
+       python -m pipeline.lyricmap projects/iceland
+
+   then writes the edit plan (projects/iceland/work/edl.json), placing each
+   clip so its imagery emotionally matches the lyric + beat playing then.
+   (You can also write/edit that file yourself — see README.md for the format.)
+
+6) PHASE 2 — build the reel:
+
+       python -m pipeline.render projects/iceland
+
+7) DONE. Your upload-ready file is here:
+
+       projects/iceland/output/reel.mp4
+
+   Upload it to Facebook as a Reel.
+
+
+---------------------------------------------------------------------------
+ NOTES
+---------------------------------------------------------------------------
+- Want a different cut? Just edit work/edl.json and re-run step 6
+  (no need to re-run prep). Or ask Claude to re-cut with a new vibe.
+- Tunable defaults (length, pacing, quality thresholds, lyric/Whisper model,
+  encode settings) live in config.yaml. Lyric sync can be turned off there
+  (lyrics.enabled: false) if you want a purely beat-driven cut.
+- Output spec: 1080x1920 vertical, H.264, 30fps, AAC stereo — Reels-ready.
+- Music: use cleared / royalty-free tracks. Trending or copyrighted songs
+  can get auto-muted or blocked by Facebook.
+
+Full details: see README.md (usage) and CLAUDE.md (how Claude drives it).
+===========================================================================
