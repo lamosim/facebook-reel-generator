@@ -166,7 +166,7 @@ Three signals let the edit read as a narrative locked to the song, not just cuts
 ## Story tools (multi-day trip reels)
 
 For a trip with days, camps and a route, the reel is a story, not a montage. Four small specs drive it
-(worked example: `projects/CANOE-2026-SEP/work/`):
+(skeletons to copy: `projects/_template/work/`):
 
 | step | command | spec → output |
 |---|---|---|
